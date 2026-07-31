@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CPCA Executive Leadership Certificate Program Calculator</title>
+  <style>
+    :root {
+      --cpca-blue: #173f78;
+      --cpca-blue-dark: #102d56;
+      --cpca-gold: #c7a35a;
+      --cpca-light: #f4f7fb;
+      --cpca-border: #d8e0ea;
+      --cpca-text: #1f2937;
+      --cpca-muted: #5f6b7a;
+      --success: #176b45;
+      --success-bg: #edf8f2;
+      --warning: #8a5a00;
+      --warning-bg: #fff7df;
+      --danger: #a12c2c;
+      --danger-bg: #fff0f0;
+      --white: #ffffff;
+      --radius: 12px;
+      --shadow: 0 8px 22px rgba(23, 63, 120, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--cpca-text);
+      background: var(--cpca-light);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+    }
+
+    button, select, input { font: inherit; }
+
+    .calculator-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, var(--cpca-blue-dark), var(--cpca-blue));
+      color: var(--white);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      margin-bottom: 22px;
+      border-bottom: 5px solid var(--cpca-gold);
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      color: #fff;
+      font-size: clamp(1.7rem, 3vw, 2.5rem);
+      line-height: 1.15;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 820px;
+      color: #edf3fb;
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--cpca-border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      margin-bottom: 22px;
+    }
+
+    .card h2 {
+      margin: 0 0 6px;
+      color: var(--cpca-blue-dark);
+      font-size: 1.35rem;
+    }
+
+    .card-subtitle {
+      margin: 0 0 18px;
+      color: var(--cpca-muted);
+      font-size: 0.96rem;
+    }
+
+    .course-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .course-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--cpca-border);
+      border-radius: 9px;
+      background: #fbfcfe;
+      transition: border-color .15s ease, background .15s ease;
+    }
+
+    .course-row.selected {
+      border-color: var(--cpca-blue);
+      background: #f6f9fd;
+    }
+
+    .course-main {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .course-main input[type="checkbox"] {
+      margin-top: 4px;
+      width: 18px;
+      height: 18px;
+      accent-color: var(--cpca-blue);
+      flex: 0 0 auto;
+    }
+
+    .course-name {
+      font-weight: 700;
+      color: var(--cpca-blue-dark);
+      font-size: 0.94rem;
+      line-height: 1.3;
+      cursor: pointer;
+    }
+
+    .course-meta {
+      display: block;
+      color: var(--cpca-muted);
+      font-size: 0.78rem;
+      margin-top: 3px;
+      line-height: 1.3;
+    }
+
+    .units-badge {
+      display: inline-block;
+      background: #e8eef7;
+      color: var(--cpca-blue-dark);
+      font-weight: 700;
+      border-radius: 999px;
+      padding: 3px 8px;
+      white-space: nowrap;
+      font-size: 0.78rem;
+      margin-top: 8px;
+    }
+
+    .date-panel {
+      display: none;
+      border-top: 1px solid var(--cpca-border);
+      padding-top: 12px;
+      margin-top: 2px;
+    }
+
+    .course-row.selected .date-panel {
+      display: block;
+    }
+
+    .date-label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: var(--cpca-blue-dark);
+    }
+
+    .date-selects {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 8px;
+    }
+
+    select {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid #bfc9d6;
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: var(--white);
+      color: var(--cpca-text);
+      font-size: 0.95rem;
+    }
+
+    select:focus,
+    button:focus-visible,
+    input:focus-visible {
+      outline: 3px solid rgba(23, 63, 120, 0.18);
+      outline-offset: 1px;
+    }
+
+    .required-note {
+      color: var(--danger);
+      font-size: 0.82rem;
+      margin-top: 6px;
+    }
+
+    .hidden { display: none !important; }
+
+    .conference-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      align-items: end;
+      border: 1px solid var(--cpca-border);
+      border-radius: 10px;
+      padding: 16px;
+      background: #fbfcfe;
+    }
+
+    .conference-box .full {
+      grid-column: 1 / -1;
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: var(--cpca-blue-dark);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    button {
+      border: none;
+      border-radius: 8px;
+      min-height: 44px;
+      padding: 10px 18px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+
+    .primary-btn {
+      background: var(--cpca-blue);
+      color: var(--white);
+    }
+
+    .primary-btn:hover {
+      background: var(--cpca-blue-dark);
+    }
+
+    .secondary-btn {
+      background: #e9eef5;
+      color: var(--cpca-blue-dark);
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .stat {
+      border: 1px solid var(--cpca-border);
+      border-radius: 10px;
+      padding: 16px;
+      background: #fbfcfe;
+    }
+
+    .stat-label {
+      color: var(--cpca-muted);
+      font-size: 0.86rem;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--cpca-blue-dark);
+    }
+
+    .message {
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin: 12px 0;
+      border: 1px solid transparent;
+    }
+
+    .message.success {
+      color: var(--success);
+      background: var(--success-bg);
+      border-color: #bfe5cf;
+    }
+
+    .message.warning {
+      color: var(--warning);
+      background: var(--warning-bg);
+      border-color: #f0d58b;
+    }
+
+    .message.danger {
+      color: var(--danger);
+      background: var(--danger-bg);
+      border-color: #efb7b7;
+    }
+
+    .results-section h3 {
+      margin: 20px 0 8px;
+      color: var(--cpca-blue-dark);
+      font-size: 1.08rem;
+    }
+
+    .results-section ul {
+      margin: 8px 0 0 20px;
+      padding: 0;
+    }
+
+    .combination {
+      border: 1px solid var(--cpca-border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-top: 10px;
+      background: #fbfcfe;
+    }
+
+    .footnote {
+      font-size: 0.86rem;
+      color: var(--cpca-muted);
+      margin-top: 14px;
+    }
+
+    .progress-section {
+      margin: 4px 0 20px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .progress-label,
+    .progress-value {
+      font-weight: 700;
+      color: var(--cpca-blue-dark);
+    }
+
+    .progress-value { white-space: nowrap; }
+
+    .progress-track {
+      width: 100%;
+      height: 14px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e3e9f1;
+      border: 1px solid var(--cpca-border);
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: 999px;
+      background: var(--cpca-blue);
+      transition: width 0.35s ease;
+    }
+
+    .progress-note {
+      margin-top: 6px;
+      color: var(--cpca-muted);
+      font-size: 0.86rem;
+    }
+
+    @media (max-width: 820px) {
+      .course-list { grid-template-columns: 1fr; }
+      .conference-box { grid-template-columns: 1fr; }
+      .results-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .conference-box .full { grid-column: auto; }
+    }
+
+    @media (max-width: 520px) {
+      .calculator-wrap { padding: 12px; }
+      .hero, .card { padding: 18px; }
+      .results-grid { grid-template-columns: 1fr; }
+      .date-selects { grid-template-columns: 1fr; }
+      .actions button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="calculator-wrap">
+    <section class="hero">
+      <h1>Executive Leadership Certificate Program Calculator</h1>
+      <p>
+        Select the eligible courses and conference you have completed to estimate your Education Units,
+        confirm whether you have met the capstone requirement, and view possible paths toward completing the certificate.
+      </p>
+    </section>
+
+    <section class="card" aria-labelledby="courses-heading">
+      <h2 id="courses-heading">1. Select completed courses</h2>
+      <p class="card-subtitle">
+        Select each completed course and enter the month and year it was completed.
+      </p>
+      <div id="courseList" class="course-list"></div>
+    </section>
+
+    <section class="card" aria-labelledby="conference-heading">
+      <h2 id="conference-heading">2. Add one eligible conference</h2>
+      <p class="card-subtitle">
+        One approved conference from the 2026–2027 education year may count for 1 EU.
+      </p>
+
+      <div class="conference-box">
+        <div>
+          <label class="field-label" for="conferenceSelect">Conference</label>
+          <select id="conferenceSelect">
+            <option value="">No conference selected</option>
+            <option>Annual Training Symposium</option>
+            <option>Rise</option>
+            <option>Technology Conference</option>
+            <option>Workers' Compensation Summit</option>
+          </select>
+        </div>
+
+        <div>
+          <span class="field-label">Attendance month and year</span>
+          <div class="date-selects">
+            <select id="conferenceMonth" disabled aria-label="Conference month"></select>
+            <select id="conferenceYear" disabled aria-label="Conference year"></select>
+          </div>
+          <div id="conferenceDateNote" class="required-note hidden">Select both a month and year.</div>
+        </div>
+
+        <div class="full footnote">
+          Only one conference may be counted. Conference credit is not retroactive. Attendance must occur on or after August 1, 2026, during the 2026–2027 education year.
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="primary-btn" id="calculateBtn">Calculate My Progress</button>
+        <button type="button" class="secondary-btn" id="resetBtn">Reset</button>
+      </div>
+    </section>
+
+    <section id="resultsCard" class="card hidden" aria-live="polite">
+      <h2>Your ELCP Progress</h2>
+      <p class="card-subtitle">This is an estimate based on the information entered.</p>
+
+      <div class="progress-section">
+        <div class="progress-header">
+          <span class="progress-label">Progress toward 10 EUs</span>
+          <span class="progress-value" id="progressValue">0 of 10 EUs</span>
+        </div>
+        <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0" id="progressTrack">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-note" id="progressNote"></div>
+      </div>
+
+      <div class="results-grid">
+        <div class="stat"><div class="stat-label">Eligible EUs earned</div><div class="stat-value" id="earnedUnits">0</div></div>
+        <div class="stat"><div class="stat-label">EUs remaining</div><div class="stat-value" id="remainingUnits">10</div></div>
+        <div class="stat"><div class="stat-label">Capstone requirement</div><div class="stat-value" id="capstoneStatus">Not met</div></div>
+        <div class="stat"><div class="stat-label">Estimated deadline</div><div class="stat-value" id="deadlineStatus">Not started</div></div>
+      </div>
+
+      <div id="statusMessages"></div>
+
+      <div class="results-section">
+        <h3>Eligible selections counted</h3>
+        <ul id="countedList"></ul>
+        <h3 id="excludedHeading" class="hidden">Selections not counted</h3>
+        <ul id="excludedList"></ul>
+        <h3>Remaining eligible courses</h3>
+        <ul id="remainingCourseList"></ul>
+        <h3>Possible paths to completion</h3>
+        <div id="combinationList"></div>
+      </div>
+
+      <p class="footnote">
+        Final eligibility and certificate completion are subject to confirmation by the California Police Chiefs Association.
+      </p>
+    </section>
+  </main>
+
+  <script>
+    const REQUIRED_UNITS = 10;
+    const months = [
+      "January","February","March","April","May","June",
+      "July","August","September","October","November","December"
+    ];
+
+    const courses = [
+      { id:"executive-leadership", name:"Executive Leadership in Policing", units:3, capstone:true, available:true },
+      { id:"emotional-intelligence", name:"Emotional Intelligence & Strategic Communication for Police Executives", units:3, capstone:false, available:true },
+      { id:"race-public-trust", name:"Executive Considerations with Race, Policing, and Public Trust", units:2, capstone:false, available:true },
+      { id:"wellness-resilience", name:"Executive Wellness, Resilience, and Sustainable Leadership", units:1, capstone:false, available:true },
+      { id:"disciplinary-action", name:"Police Executive and the Administration of Disciplinary Action", units:1, capstone:false, available:true },
+      { id:"chief-city-manager", name:"Police Chief and City Manager", units:1, capstone:false, available:true },
+      { id:"foundations", name:"Foundations of Executive Leadership in Policing", units:3, capstone:true, available:false },
+      { id:"critical-considerations-executive", name:"Critical Considerations for the Police Executive", units:3, capstone:true, available:false },
+      { id:"effective-stewardship", name:"Effective Stewardship in Policing", units:3, capstone:true, available:false },
+      { id:"fundamentals", name:"Fundamentals of Executive Leadership in Policing", units:3, capstone:true, available:false },
+      { id:"critical-considerations-executives", name:"Critical Considerations for Police Executives", units:3, capstone:true, available:false },
+      { id:"executive-stewardship", name:"Executive Stewardship in Policing", units:3, capstone:true, available:false },
+      { id:"principles", name:"Principles of Executive Leadership in Policing", units:3, capstone:true, available:false },
+      { id:"critical-leadership", name:"Critical Leadership Issues in Policing", units:3, capstone:true, available:false }
+    ];
+
+    function buildSelect(id, placeholder, options, disabled = false) {
+      return `
+        <select id="${id}" ${disabled ? "disabled" : ""}>
+          <option value="">${placeholder}</option>
+          ${options.map(o => `<option value="${o.value}">${o.label}</option>`).join("")}
+        </select>
+      `;
+    }
+
+    function yearOptions() {
+      const currentYear = new Date().getFullYear();
+      const years = [];
+      for (let year = currentYear + 1; year >= 2020; year--) {
+        years.push({ value: year, label: year });
+      }
+      return years;
+    }
+
+    function renderCourses() {
+      const list = document.getElementById("courseList");
+      list.innerHTML = courses.map(course => `
+        <article class="course-row" data-row="${course.id}">
+          <div class="course-main">
+            <input type="checkbox" id="course-${course.id}" data-course-id="${course.id}">
+            <div>
+              <label class="course-name" for="course-${course.id}">${course.name}</label>
+              <span class="course-meta">
+                ${course.units} ${course.units === 1 ? "EU" : "EUs"}${course.capstone ? " • Capstone eligible" : ""}
+              </span>
+              <span class="units-badge">${course.units} ${course.units === 1 ? "EU" : "EUs"}</span>
+            </div>
+          </div>
+          <div class="date-panel">
+            <span class="date-label">When did you complete this course?</span>
+            <div class="date-selects">
+              ${buildSelect(`month-${course.id}`, "Select month", months.map((m,i)=>({value:i+1,label:m})), true)}
+              ${buildSelect(`year-${course.id}`, "Select year", yearOptions(), true)}
+            </div>
+            <div id="note-${course.id}" class="required-note hidden">Select both a month and year.</div>
+          </div>
+        </article>
+      `).join("");
+
+      document.querySelectorAll('input[type="checkbox"][data-course-id]').forEach(checkbox => {
+        checkbox.addEventListener("change", () => {
+          const id = checkbox.dataset.courseId;
+          const row = document.querySelector(`[data-row="${id}"]`);
+          const month = document.getElementById(`month-${id}`);
+          const year = document.getElementById(`year-${id}`);
+
+          row.classList.toggle("selected", checkbox.checked);
+          month.disabled = !checkbox.checked;
+          year.disabled = !checkbox.checked;
+
+          if (!checkbox.checked) {
+            month.value = "";
+            year.value = "";
+            document.getElementById(`note-${id}`).classList.add("hidden");
+          }
+        });
+      });
+    }
+
+    function populateConferenceDate() {
+      document.getElementById("conferenceMonth").innerHTML =
+        `<option value="">Select month</option>` +
+        months.map((m,i)=>`<option value="${i+1}">${m}</option>`).join("");
+
+      document.getElementById("conferenceYear").innerHTML =
+        `<option value="">Select year</option>` +
+        yearOptions().map(y=>`<option value="${y.value}">${y.label}</option>`).join("");
+    }
+
+    function dateFromParts(month, year) {
+      if (!month || !year) return null;
+      return new Date(Number(year), Number(month) - 1, 1);
+    }
+
+    function formatMonth(date) {
+      return date.toLocaleDateString("en-US", { month:"long", year:"numeric" });
+    }
+
+    function addThreeYears(date) {
+      return new Date(date.getFullYear() + 3, date.getMonth(), 1);
+    }
+
+    function getSelectedEntries() {
+      const entries = [];
+      let valid = true;
+
+      courses.forEach(course => {
+        const checkbox = document.getElementById(`course-${course.id}`);
+        const month = document.getElementById(`month-${course.id}`);
+        const year = document.getElementById(`year-${course.id}`);
+        const note = document.getElementById(`note-${course.id}`);
+
+        if (checkbox.checked) {
+          if (!month.value || !year.value) {
+            note.classList.remove("hidden");
+            valid = false;
+          } else {
+            note.classList.add("hidden");
+            entries.push({ ...course, type:"course", date:dateFromParts(month.value, year.value) });
+          }
+        } else {
+          note.classList.add("hidden");
+        }
+      });
+
+      const conference = document.getElementById("conferenceSelect").value;
+      const conferenceMonth = document.getElementById("conferenceMonth").value;
+      const conferenceYear = document.getElementById("conferenceYear").value;
+      const conferenceNote = document.getElementById("conferenceDateNote");
+
+      if (conference) {
+        if (!conferenceMonth || !conferenceYear) {
+          conferenceNote.classList.remove("hidden");
+          valid = false;
+        } else {
+          conferenceNote.classList.add("hidden");
+          entries.push({
+            id:"conference",
+            type:"conference",
+            name:conference,
+            units:1,
+            capstone:false,
+            date:dateFromParts(conferenceMonth, conferenceYear)
+          });
+        }
+      } else {
+        conferenceNote.classList.add("hidden");
+      }
+
+      return { entries, valid };
+    }
+
+    function isEligibleConferenceDate(date) {
+      const start = new Date(2026, 7, 1);
+      const end = new Date(2027, 5, 30);
+      return date >= start && date <= end;
+    }
+
+    function getCombinations(remainingCourses, unitsNeeded, capstoneMet) {
+      const candidates = remainingCourses.filter(c => c.available);
+      const results = [];
+
+      for (let mask = 1; mask < (1 << candidates.length); mask++) {
+        const combo = [];
+        let units = 0;
+        let includesCapstone = false;
+
+        candidates.forEach((course, index) => {
+          if (mask & (1 << index)) {
+            combo.push(course);
+            units += course.units;
+            if (course.capstone) includesCapstone = true;
+          }
+        });
+
+        if (units >= unitsNeeded && (capstoneMet || includesCapstone)) {
+          results.push({ combo, units, overage:units-unitsNeeded });
+        }
+      }
+
+      return results
+        .sort((a,b)=>a.combo.length-b.combo.length || a.overage-b.overage || a.units-b.units)
+        .slice(0,5);
+    }
+
+    function calculate() {
+      const { entries, valid } = getSelectedEntries();
+      if (!valid) return;
+
+      const sorted = [...entries].sort((a,b)=>a.date-b.date);
+      const firstDate = sorted.length ? sorted[0].date : null;
+      const deadline = firstDate ? addThreeYears(firstDate) : null;
+      const counted = [];
+      const excluded = [];
+
+      sorted.forEach(entry => {
+        if (entry.type === "conference" && !isEligibleConferenceDate(entry.date)) {
+          excluded.push({ ...entry, reason:"Conference attendance was outside the eligible period." });
+        } else if (deadline && entry.date > deadline) {
+          excluded.push({ ...entry, reason:`Completed after the estimated deadline of ${formatMonth(deadline)}.` });
+        } else {
+          counted.push(entry);
+        }
+      });
+
+      const earned = counted.reduce((sum,item)=>sum+item.units,0);
+      const remaining = Math.max(0, REQUIRED_UNITS-earned);
+      const capstoneMet = counted.some(item=>item.capstone);
+      const complete = earned >= REQUIRED_UNITS && capstoneMet;
+
+      document.getElementById("progressFill").style.width = `${Math.min(100,(earned/REQUIRED_UNITS)*100)}%`;
+      document.getElementById("progressTrack").setAttribute("aria-valuenow", Math.min(earned,REQUIRED_UNITS));
+      document.getElementById("progressValue").textContent = `${earned} of ${REQUIRED_UNITS} EUs`;
+      document.getElementById("progressNote").textContent =
+        complete ? "You have reached the unit requirement and satisfied the capstone requirement."
+        : earned >= REQUIRED_UNITS ? "You have reached the unit requirement but still need a qualifying capstone."
+        : `${remaining} ${remaining === 1 ? "EU remains" : "EUs remain"} toward the unit requirement.`;
+
+      document.getElementById("earnedUnits").textContent = earned;
+      document.getElementById("remainingUnits").textContent = remaining;
+      document.getElementById("capstoneStatus").textContent = capstoneMet ? "Met" : "Not met";
+      document.getElementById("deadlineStatus").textContent = deadline ? formatMonth(deadline) : "Not started";
+
+      const messages = [];
+      if (complete) {
+        messages.push(`<div class="message success"><strong>Estimated certificate requirements met.</strong> You have at least 10 eligible EUs and a qualifying capstone.</div>`);
+      } else {
+        if (earned < REQUIRED_UNITS) messages.push(`<div class="message warning">You need <strong>${remaining} more ${remaining === 1 ? "EU" : "EUs"}</strong>.</div>`);
+        if (!capstoneMet) messages.push(`<div class="message warning">You still need a qualifying capstone course.</div>`);
+      }
+      if (excluded.length) messages.push(`<div class="message danger">One or more selections were not counted because they fell outside the applicable eligibility period.</div>`);
+      document.getElementById("statusMessages").innerHTML = messages.join("");
+
+      document.getElementById("countedList").innerHTML = counted.length
+        ? counted.map(item=>`<li>${item.name}, ${formatMonth(item.date)}: ${item.units} ${item.units === 1 ? "EU" : "EUs"}${item.capstone ? " (capstone)" : ""}</li>`).join("")
+        : "<li>No eligible selections were counted.</li>";
+
+      const excludedHeading = document.getElementById("excludedHeading");
+      if (excluded.length) {
+        excludedHeading.classList.remove("hidden");
+        document.getElementById("excludedList").innerHTML =
+          excluded.map(item=>`<li>${item.name}, ${formatMonth(item.date)}: ${item.reason}</li>`).join("");
+      } else {
+        excludedHeading.classList.add("hidden");
+        document.getElementById("excludedList").innerHTML = "";
+      }
+
+      const selectedIds = new Set(entries.filter(e=>e.type==="course").map(e=>e.id));
+      const remainingCourses = courses.filter(c=>c.available && !selectedIds.has(c.id));
+
+      document.getElementById("remainingCourseList").innerHTML = remainingCourses.length
+        ? remainingCourses.map(c=>`<li>${c.name}: ${c.units} ${c.units === 1 ? "EU" : "EUs"}${c.capstone ? " (capstone)" : ""}</li>`).join("")
+        : "<li>No currently available courses remain unselected.</li>";
+
+      const combos = getCombinations(remainingCourses, Math.max(remaining, capstoneMet ? 0 : 1), capstoneMet);
+      document.getElementById("combinationList").innerHTML = complete
+        ? `<div class="combination">No additional coursework is needed based on the information entered.</div>`
+        : combos.length
+          ? combos.map((result,index)=>`
+              <div class="combination">
+                <strong>Option ${index+1}:</strong> ${result.combo.map(c=>c.name).join(" + ")}
+                <br><span class="course-meta">Adds ${result.units} ${result.units === 1 ? "EU" : "EUs"}${result.combo.some(c=>c.capstone) ? " and satisfies the capstone requirement" : ""}.</span>
+              </div>`).join("")
+          : `<div class="combination">Please contact CPCA for help reviewing your remaining path.</div>`;
+
+      const results = document.getElementById("resultsCard");
+      results.classList.remove("hidden");
+      results.scrollIntoView({behavior:"smooth",block:"start"});
+    }
+
+    function resetCalculator() {
+      document.querySelectorAll('input[type="checkbox"][data-course-id]').forEach(cb=>{
+        cb.checked = false;
+        cb.closest(".course-row").classList.remove("selected");
+      });
+
+      document.querySelectorAll('[id^="month-"], [id^="year-"]').forEach(select=>{
+        select.value = "";
+        select.disabled = true;
+      });
+
+      document.querySelectorAll(".required-note").forEach(note=>note.classList.add("hidden"));
+
+      document.getElementById("conferenceSelect").value = "";
+      document.getElementById("conferenceMonth").value = "";
+      document.getElementById("conferenceYear").value = "";
+      document.getElementById("conferenceMonth").disabled = true;
+      document.getElementById("conferenceYear").disabled = true;
+      document.getElementById("resultsCard").classList.add("hidden");
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
+
+    document.addEventListener("DOMContentLoaded", ()=>{
+      renderCourses();
+      populateConferenceDate();
+
+      document.getElementById("conferenceSelect").addEventListener("change", e=>{
+        const enabled = Boolean(e.target.value);
+        document.getElementById("conferenceMonth").disabled = !enabled;
+        document.getElementById("conferenceYear").disabled = !enabled;
+        if (!enabled) {
+          document.getElementById("conferenceMonth").value = "";
+          document.getElementById("conferenceYear").value = "";
+        }
+      });
+
+      document.getElementById("calculateBtn").addEventListener("click", calculate);
+      document.getElementById("resetBtn").addEventListener("click", resetCalculator);
+    });
+  </script>
+</body>
+</html>
